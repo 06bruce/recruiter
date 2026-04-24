@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/lib/authContext'
+import { candidatesApi } from '@/lib/api'
 
 export default function CandidateFormPage() {
   const router = useRouter()
@@ -33,8 +34,13 @@ export default function CandidateFormPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (file.type !== 'application/pdf') {
-        setError('Please upload a PDF file')
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ]
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please upload PDF, DOC, or DOCX file')
         return
       }
       setFormData((prev) => ({
@@ -60,21 +66,43 @@ export default function CandidateFormPage() {
       setLoading(false)
       return
     }
+    if (!/^\d{10,}$/.test(formData.phone)) {
+      setError('Phone number must be at least 10 digits')
+      setLoading(false)
+      return
+    }
 
     try {
+      // Build FormData for file upload
+      const fd = new FormData()
+      fd.append('name', formData.name)
+      fd.append('email', formData.email)
+      fd.append('phone', formData.phone)
+      fd.append('positionApplied', formData.positionApplied)
+      if (formData.cvFile) fd.append('cv', formData.cvFile)
+
+      const result = await candidatesApi.apply(fd)
+
+      // Keep local state for success page
       submitCandidateApplication({
         id: '',
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         positionApplied: formData.positionApplied,
-        cvFileName: formData.cvFile.name,
+        cvFileName: formData.cvFile!.name,
         submittedAt: new Date(),
       })
 
-      router.push('/candidate/success')
+      // Pass emailSent status and email to the success page
+      const params = new URLSearchParams({
+        emailSent: result.emailSent ? 'true' : 'false',
+        email: formData.email,
+      })
+      router.push(`/candidate/success?${params.toString()}`)
     } catch (err) {
-      setError('Failed to submit application')
+      const msg = err instanceof Error ? err.message : 'Failed to submit application'
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -169,14 +197,14 @@ export default function CandidateFormPage() {
           {/* CV Upload */}
           <div>
             <Label htmlFor="cvFile" className="block text-sm font-medium text-gray-700 mb-2">
-              Upload CV (PDF)
+              Upload CV (PDF, DOC, DOCX)
             </Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg px-6 py-8 text-center hover:border-blue-500 transition cursor-pointer">
               <input
                 id="cvFile"
                 name="cvFile"
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -201,7 +229,7 @@ export default function CandidateFormPage() {
                     ? `Selected: ${formData.cvFile.name}`
                     : 'Click to upload or drag and drop'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">PDF files only</p>
+                <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX up to 5MB</p>
               </label>
             </div>
           </div>

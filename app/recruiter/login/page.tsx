@@ -38,12 +38,11 @@ export default function LoginPage() {
     }
 
     try {
-      // Extract name from email for display
-      const name = formData.email.split('@')[0]
-      login(name.charAt(0).toUpperCase() + name.slice(1), formData.email)
+      await login(formData.email, formData.password)
       router.push('/recruiter/dashboard')
     } catch (err) {
-      setError('Failed to login')
+      const msg = err instanceof Error ? err.message : 'Failed to login'
+      setError(msg)
     } finally {
       setLoading(false)
     }

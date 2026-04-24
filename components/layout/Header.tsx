@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/authContext'
+import { roleLabelMap } from '@/lib/mappers'
 import { Search, Bell, ChevronRight } from 'lucide-react'
 
 export function Header() {
@@ -35,7 +36,7 @@ export function Header() {
                 {recruiter?.name || 'User'}
               </p>
               <p className="text-xs text-gray-500">
-                {recruiter?.role || 'HR Manager'}
+                {recruiter?.role ? roleLabelMap[recruiter.role] : 'HR Manager'}
               </p>
             </div>
             <button className="flex items-center text-gray-600 hover:text-gray-900 transition">

@@ -35,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased bg-white">
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased bg-white" suppressHydrationWarning>
         <AuthProvider>
           {children}
           {process.env.NODE_ENV === 'production' && <Analytics />}

@@ -38,7 +38,7 @@ export function DepartmentCard({
       <h3 className="text-lg font-semibold text-gray-900 mb-3">{department.name}</h3>
 
       <div className="text-sm">
-        {department.status === 'Fulfilled' ? (
+        {department.status === 'FULFILLED' ? (
           <p className="text-green-600">Fulfilled</p>
         ) : (
           <p className="text-red-600">-{department.capacity - department.employeeCount} People</p>

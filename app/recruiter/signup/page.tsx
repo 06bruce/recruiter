@@ -10,17 +10,18 @@ import { useAuth } from '@/lib/authContext'
 
 export default function SignupPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { signup } = useAuth()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'HR_MANAGER',
   })
   const [error, setError] = useState('')
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -50,18 +51,19 @@ export default function SignupPage() {
       return
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters')
       setLoading(false)
       return
     }
 
     try {
-      // Create account and log in
-      login(formData.name, formData.email)
+      // Create account via API
+      await signup(formData.name, formData.email, formData.password, formData.role)
       router.push('/recruiter/dashboard')
     } catch (err) {
-      setError('Failed to create account')
+      const msg = err instanceof Error ? err.message : 'Failed to create account'
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -130,6 +132,23 @@ export default function SignupPage() {
           </div>
 
           {/* Confirm Password */}
+                    {/* Role */}
+                    <div>
+                      <Label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                        Role
+                      </Label>
+                      <select
+                        id="role"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="HR_MANAGER">HR Manager</option>
+                        <option value="MANAGING_DIRECTOR">Managing Director</option>
+                      </select>
+                    </div>
+
           <div>
             <Label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password

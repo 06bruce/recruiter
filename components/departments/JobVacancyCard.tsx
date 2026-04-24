@@ -4,9 +4,11 @@ import { MapPin, Clock, Users } from 'lucide-react'
 
 interface JobVacancyCardProps {
   vacancy: JobVacancy
+  onEdit: (vacancy: JobVacancy) => void
+  onDetail: (vacancy: JobVacancy) => void
 }
 
-export function JobVacancyCard({ vacancy }: JobVacancyCardProps) {
+export function JobVacancyCard({ vacancy, onEdit, onDetail }: JobVacancyCardProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
       {/* Image */}
@@ -49,10 +51,11 @@ export function JobVacancyCard({ vacancy }: JobVacancyCardProps) {
 
         {/* Buttons */}
         <div className="flex gap-3">
-          <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">
+          <Button onClick={() => onEdit(vacancy)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">
             Edit
           </Button>
           <Button
+            onClick={() => onDetail(vacancy)}
             variant="outline"
             className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg"
           >

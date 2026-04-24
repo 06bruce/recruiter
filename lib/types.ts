@@ -3,7 +3,7 @@ export interface RecruiterUser {
   id: string
   name: string
   email: string
-  role: 'Managing Director' | 'HR Manager'
+  role: 'MANAGING_DIRECTOR' | 'HR_MANAGER'
 }
 
 // Candidate Application Types
@@ -40,8 +40,12 @@ export interface Candidate {
   avatar: string
   department: string
   position: string
+  email: string
+  phone: string
+  cvFileName: string
+  cvFilePath: string
   dateTime: string
-  status: 'Pending Interview' | 'Accepted' | 'Rejected'
+  status: 'PENDING' | 'PENDING_INTERVIEW' | 'ACCEPTED' | 'REJECTED'
   matchScore: number
   description: string
   strengths: string[]
@@ -55,7 +59,7 @@ export interface Department {
   name: string
   employeeCount: number
   capacity: number
-  status: 'Fulfilled' | 'Pending'
+  status: 'FULFILLED' | 'PENDING'
 }
 
 // Job Vacancy
@@ -77,7 +81,10 @@ export interface AuthContextType {
   recruiter: RecruiterUser | null
   candidate: CandidateApplication | null
   userType: 'recruiter' | 'candidate' | null
-  login: (name: string, email: string) => void
-  logout: () => void
-  submitCandidateApplication: (data: CandidateApplication) => void
+  login: (email: string, password: string) => Promise<RecruiterUser>
+  signup: (name: string, email: string, password: string, role: string) => Promise<RecruiterUser>
+  logout: () => Promise<void>
+  submitCandidateApplication: (data: CandidateApplication) => Promise<CandidateApplication>
+  loading?: boolean
+  error?: string | null
 }

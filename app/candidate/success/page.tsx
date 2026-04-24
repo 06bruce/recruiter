@@ -1,18 +1,26 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, AlertTriangle } from 'lucide-react'
 
-export default function SuccessPage() {
+function SuccessContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const emailSent = searchParams.get('emailSent') === 'true'
+  const email = searchParams.get('email') || 'your email'
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <div className="w-full max-w-lg text-center">
-        {/* Success Icon */}
+        {/* Icon */}
         <div className="flex justify-center mb-8">
-          <CheckCircle className="w-24 h-24 text-green-500" strokeWidth={1.5} />
+          {emailSent ? (
+            <CheckCircle className="w-24 h-24 text-green-500" strokeWidth={1.5} />
+          ) : (
+            <AlertTriangle className="w-24 h-24 text-amber-500" strokeWidth={1.5} />
+          )}
         </div>
 
         {/* Title */}
@@ -21,19 +29,39 @@ export default function SuccessPage() {
         </h1>
 
         {/* Message */}
-        <p className="text-lg text-gray-600 mb-2">
-          Thank you for your application.
-        </p>
-        <p className="text-gray-600 mb-8">
-          You&apos;ll see your results later. We&apos;ll review your CV and get back to you soon.
-        </p>
+        {emailSent ? (
+          <>
+            <p className="text-lg text-gray-600 mb-2">
+              Thank you for your application.
+            </p>
+            <p className="text-gray-600 mb-8">
+              A confirmation email has been sent to <strong>{email}</strong>.
+            </p>
 
-        {/* Secondary Message */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-6 py-4 mb-8">
-          <p className="text-blue-900 text-sm">
-            Please check your email for updates on your application status.
-          </p>
-        </div>
+            {/* Success Email Banner */}
+            <div className="bg-green-50 border border-green-200 rounded-lg px-6 py-4 mb-8">
+              <p className="text-green-900 text-sm">
+                ✅ Confirmation email sent successfully. Please check your inbox (and spam folder) for updates on your application status.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-lg text-gray-600 mb-2">
+              Your application was received, but we couldn&apos;t send a confirmation email to <strong>{email}</strong>.
+            </p>
+            <p className="text-gray-600 mb-8">
+              Don&apos;t worry — your application is still being processed. Our team will review your CV and get back to you soon.
+            </p>
+
+            {/* Warning Email Banner */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-6 py-4 mb-8">
+              <p className="text-amber-900 text-sm">
+                ⚠️ Confirmation email could not be sent. Please ensure your email address is correct. If you have any concerns, contact our support team.
+              </p>
+            </div>
+          </>
+        )}
 
         {/* Back to Home Button */}
         <Button
@@ -44,5 +72,17 @@ export default function SuccessPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }

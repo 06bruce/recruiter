@@ -3,6 +3,8 @@
 import { Candidate } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { candidatesApi } from '@/lib/api'
+import { getCandidateStatusLabel } from '@/lib/mappers'
 
 interface CandidateDetailModalProps {
   candidate: Candidate | null
@@ -11,6 +13,13 @@ interface CandidateDetailModalProps {
 
 export function CandidateDetailModal({ candidate, onClose }: CandidateDetailModalProps) {
   if (!candidate) return null
+
+  const handleScheduleInterview = async () => {
+    if (candidate.status === 'PENDING') {
+      await candidatesApi.updateStatus(candidate.id, 'PENDING_INTERVIEW')
+    }
+    window.location.href = '/recruiter/scheduling'
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -123,13 +132,13 @@ export function CandidateDetailModal({ candidate, onClose }: CandidateDetailModa
               <p className="text-gray-500 text-sm">Status</p>
               <p className="text-gray-900 font-medium">
                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                  candidate.status === 'Pending Interview'
+                  candidate.status === 'PENDING_INTERVIEW'
                     ? 'bg-yellow-100 text-yellow-800'
-                    : candidate.status === 'Accepted'
+                    : candidate.status === 'ACCEPTED'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
                 }`}>
-                  {candidate.status}
+                  {getCandidateStatusLabel(candidate.status)}
                 </span>
               </p>
             </div>
@@ -145,7 +154,7 @@ export function CandidateDetailModal({ candidate, onClose }: CandidateDetailModa
           >
             Close
           </Button>
-          <Button className="px-6 bg-blue-600 hover:bg-blue-700 text-white">
+          <Button onClick={() => void handleScheduleInterview()} className="px-6 bg-blue-600 hover:bg-blue-700 text-white">
             Schedule Interview
           </Button>
         </div>

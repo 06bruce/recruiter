@@ -6,9 +6,11 @@ import Image from 'next/image'
 
 interface CandidatesTableProps {
   candidates: Candidate[]
+  onStatusChange: (id: string, status: string) => Promise<void>
+  onViewPortfolio: (candidate: Candidate) => void
 }
 
-export function CandidatesTable({ candidates }: CandidatesTableProps) {
+export function CandidatesTable({ candidates, onStatusChange, onViewPortfolio }: CandidatesTableProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <table className="w-full">
@@ -50,17 +52,22 @@ export function CandidatesTable({ candidates }: CandidatesTableProps) {
 
               {/* Status */}
               <td className="px-6 py-4">
-                <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-                  {candidate.status === 'Pending Interview' && '• Pending Interview'}
-                  {candidate.status === 'Accepted' && '• Accepted'}
-                  {candidate.status === 'Rejected' && '• Rejected'}
-                </span>
+                <select
+                  value={candidate.status}
+                  onChange={(e) => void onStatusChange(candidate.id, e.target.value)}
+                  className="px-2 py-1 border border-gray-300 rounded text-sm"
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="PENDING_INTERVIEW">Pending Interview</option>
+                  <option value="ACCEPTED">Accepted</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
               </td>
 
               {/* Actions */}
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <button className="text-gray-600 hover:text-gray-900 transition flex items-center gap-1">
+                  <button onClick={() => onViewPortfolio(candidate)} className="text-gray-600 hover:text-gray-900 transition flex items-center gap-1">
                     <Eye size={18} />
                     <span className="text-sm hidden sm:inline">Lihat Portfolio</span>
                   </button>
